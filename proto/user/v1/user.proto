@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package user.v1;
+
+option go_package = "github.com/gsistelos/golang-gRPC-API/gen/user/v1";
+
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+}
+
+service UserService {
+  rpc AddUser(AddUserRequest) returns (AddUserResponse) {}
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+}
+
+message AddUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message AddUserResponse { User user = 1; }
+
+message ListUsersRequest {
+  int32 offset = 1;
+  int32 limit = 2;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+  int32 count = 2;
+  bool has_next = 3;
+}
+
+message GetUserRequest { string user_id = 1; }
+
+message GetUserResponse { User user = 1; }
+
+message UpdateUserRequest { User user = 1; }
+
+message UpdateUserResponse { User user = 1; }
+
+message DeleteUserRequest { string user_id = 1; }
+
+message DeleteUserResponse { string user_id = 1; }
