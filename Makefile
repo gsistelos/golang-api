@@ -6,7 +6,7 @@ proto:
 
 .PHONY: sqlc
 sqlc:
-	sqlc generate
+	sqlc generate -f sqlc/sqlc.yaml
 
 .PHONY: run
 run:

@@ -2,8 +2,9 @@ version: "2"
 sql:
   - engine: "mysql"
     schema: "schema.sql"
-    queries: "query.sql"
+    queries:
+      - "users.sql"
     gen:
       go:
         package: "db"
-        out: "gen/db"
+        out: "../gen/db"
