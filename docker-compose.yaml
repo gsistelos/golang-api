@@ -1,6 +1,6 @@
 networks:
-  gRPC-API:
-    name: gRPC-API
+  grpc-api:
+    name: grpc-api
 
 volumes:
   data:
@@ -11,7 +11,7 @@ services:
     image: mysql
     env_file: .env
     networks:
-      - gRPC-API
+      - grpc-api
     ports:
       - "3306:3306"
     volumes:

@@ -6,8 +6,8 @@ import (
 	"net"
 	"os"
 
-	v1 "github.com/gsistelos/golang-gRPC-API/gen/user/v1"
-	"github.com/gsistelos/golang-gRPC-API/server"
+	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
+	"github.com/gsistelos/grpc-api/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -21,19 +21,20 @@ func main() {
 func run() error {
 	grpcServer := grpc.NewServer()
 	srv := server.New()
+
 	v1.RegisterUserServiceServer(grpcServer, srv)
 	reflection.Register(grpcServer)
 
-	port := os.Getenv("8000")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8000"
 	}
 
-	l, err := net.Listen("tcp", ":"+port)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("failed to listen to port %s", port)
 	}
-	defer l.Close()
+	defer lis.Close()
 
-	return grpcServer.Serve(l)
+	return grpcServer.Serve(lis)
 }

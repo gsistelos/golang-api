@@ -1,1 +1,1 @@
-# golang-gRPC-API
+# grpc-api
