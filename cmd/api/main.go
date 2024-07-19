@@ -1,11 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
 	"github.com/gsistelos/grpc-api/server"
 	"google.golang.org/grpc"
@@ -18,9 +20,35 @@ func main() {
 	}
 }
 
+func getDbCredentials() (string, string, string) {
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		dbUser = "root"
+	}
+
+	dbPassword := os.Getenv("DB_PASSWORD")
+
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		dbName = "mysql"
+	}
+
+	return dbUser, dbPassword, dbName
+}
+
 func run() error {
+	dbUser, dbPassword, dbName := getDbCredentials()
+	if dbPassword == "" {
+		return fmt.Errorf("DB_PASSWORD environment variable is required")
+	}
+
+	db, err := sql.Open("mysql", dbUser+":"+dbPassword+"@/"+dbName+"?parseTime=true")
+	if err != nil {
+		return err
+	}
+
 	grpcServer := grpc.NewServer()
-	srv := server.New()
+	srv := server.New(db)
 
 	v1.RegisterUserServiceServer(grpcServer, srv)
 	reflection.Register(grpcServer)

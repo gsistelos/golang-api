@@ -1,19 +1,22 @@
 package server
 
 import (
-	"sync"
+	"context"
+	"database/sql"
 
+	database "github.com/gsistelos/grpc-api/gen/db"
 	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
 )
 
 type Server struct {
-	mu sync.Mutex
-	us map[string]*v1.User
+	ctx     context.Context
+	queries *database.Queries
 	v1.UnimplementedUserServiceServer
 }
 
-func New() *Server {
+func New(db *sql.DB) *Server {
 	return &Server{
-		us: make(map[string]*v1.User),
+		ctx:     context.Background(),
+		queries: database.New(db),
 	}
 }
