@@ -1,4 +1,4 @@
-BUF_GENERATE = buf generate --template proto/buf.gen.yaml
+BUF_GENERATE = buf generate --template proto/buf.gen.yaml proto
 
 SQLC_GENERATE = sqlc generate -f sqlc.yaml
 
@@ -20,7 +20,7 @@ all: proto sqlc run
 
 .PHONY: proto
 proto:
-	$(BUF_GENERATE) proto
+	$(BUF_GENERATE)
 
 .PHONY: sqlc
 sqlc:
