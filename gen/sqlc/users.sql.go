@@ -3,7 +3,7 @@
 //   sqlc v1.26.0
 // source: users.sql
 
-package db
+package sqlc
 
 import (
 	"context"
@@ -12,20 +12,26 @@ import (
 
 const createUser = `-- name: CreateUser :execresult
 INSERT INTO users (
-    username, email, password
+    id, username, email, password
 ) VALUES (
-    ?, ?, ?
+    ?, ?, ?, ?
 )
 `
 
 type CreateUserParams struct {
+	ID       string
 	Username string
 	Email    string
 	Password string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
+	return q.db.ExecContext(ctx, createUser,
+		arg.ID,
+		arg.Username,
+		arg.Email,
+		arg.Password,
+	)
 }
 
 const deleteUser = `-- name: DeleteUser :exec
@@ -33,17 +39,17 @@ DELETE FROM users
 WHERE id = ?
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id []byte) error {
+func (q *Queries) DeleteUser(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteUser, id)
 	return err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, email, password, created_at, updated_at FROM users
+SELECT id, username, email, password FROM users
 WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id []byte) (User, error) {
+func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
 	var i User
 	err := row.Scan(
@@ -51,14 +57,12 @@ func (q *Queries) GetUser(ctx context.Context, id []byte) (User, error) {
 		&i.Username,
 		&i.Email,
 		&i.Password,
-		&i.CreatedAt,
-		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, email, password, created_at, updated_at FROM users
+SELECT id, username, email, password FROM users
 LIMIT ? OFFSET ?
 `
 
@@ -81,8 +85,6 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.Username,
 			&i.Email,
 			&i.Password,
-			&i.CreatedAt,
-			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -107,7 +109,7 @@ type UpdateUserParams struct {
 	Username string
 	Email    string
 	Password string
-	ID       []byte
+	ID       string
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (sql.Result, error) {

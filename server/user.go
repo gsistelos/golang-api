@@ -4,83 +4,85 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	sqlc "github.com/gsistelos/grpc-api/gen/sqlc"
 	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func (s *Server) AddUser(ctx context.Context, req *v1.AddUserRequest) (*v1.AddUserResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	u := v1.User{
-		Id:       uuid.New().String(),
-		Username: req.Username,
-		Email:    req.Email,
+func SqlcToV1(u *sqlc.User) *v1.User {
+	return &v1.User{
+		Id:       u.ID,
+		Username: u.Username,
+		Email:    u.Email,
 	}
-
-	s.us[u.Id] = &u
-
-	return &v1.AddUserResponse{User: &u}, nil
 }
 
-// TODO: Offset and limit
-//
-//		Map pagination is too weird,
-//	 after implementing database I'll see it
-func (s *Server) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.ListUsersResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *Server) AddUser(ctx context.Context, req *v1.AddUserRequest) (*v1.AddUserResponse, error) {
+	id := uuid.NewString()
 
-	us := make([]*v1.User, 0, len(s.us))
-	for id := range s.us {
-		u := s.us[id]
-		us = append(us, u)
+	_, err := s.queries.CreateUser(ctx, sqlc.CreateUserParams{
+		ID:       id,
+		Username: req.Username,
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	return &v1.ListUsersResponse{
-		Users:   us,
-		Count:   0,
-		HasNext: false,
-	}, nil
+	user, err := s.queries.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.AddUserResponse{User: SqlcToV1(&user)}, nil
 }
 
 func (s *Server) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v1.GetUserResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	u, ok := s.us[req.UserId]
-	if !ok {
-		return nil, status.Errorf(codes.NotFound, "user with ID: %s does not exists", req.UserId)
+	user, err := s.queries.GetUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
 	}
 
-	return &v1.GetUserResponse{User: u}, nil
+	return &v1.GetUserResponse{User: SqlcToV1(&user)}, nil
+}
+
+func (s *Server) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.ListUsersResponse, error) {
+	users, err := s.queries.ListUsers(ctx, sqlc.ListUsersParams{Limit: req.Limit, Offset: req.Offset})
+	if err != nil {
+		return nil, err
+	}
+
+	v1Users := make([]*v1.User, len(users))
+	for i, user := range users {
+		v1Users[i] = SqlcToV1(&user)
+	}
+
+	return &v1.ListUsersResponse{Users: v1Users}, nil
 }
 
 func (s *Server) UpdateUser(ctx context.Context, req *v1.UpdateUserRequest) (*v1.UpdateUserResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	u, ok := s.us[req.User.Id]
-	if !ok {
-		return nil, status.Errorf(codes.NotFound, "user with ID: %s does not exists", req.User.Id)
+	_, err := s.queries.UpdateUser(ctx, sqlc.UpdateUserParams{
+		ID:       req.UserId,
+		Username: req.Username,
+		Email:    req.Email,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	u.Username = req.User.Username
-	u.Email = req.User.Email
+	user, err := s.queries.GetUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
 
-	return &v1.UpdateUserResponse{User: u}, nil
+	return &v1.UpdateUserResponse{User: SqlcToV1(&user)}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserResponse, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	_, ok := s.us[req.UserId]
-	if !ok {
-		return nil, status.Errorf(codes.NotFound, "user with ID: %s does not exists", req.UserId)
+	err := s.queries.DeleteUser(ctx, req.UserId)
+	if err != nil {
+		return nil, err
 	}
-	delete(s.us, req.UserId)
 
 	return &v1.DeleteUserResponse{}, nil
 }

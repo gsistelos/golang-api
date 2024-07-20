@@ -21,14 +21,14 @@ func main() {
 }
 
 func getDbCredentials() (string, string, string) {
-	dbUser := os.Getenv("DB_USER")
+	dbUser := os.Getenv("MYSQL_USER")
 	if dbUser == "" {
 		dbUser = "root"
 	}
 
-	dbPassword := os.Getenv("DB_PASSWORD")
+	dbPassword := os.Getenv("MYSQL_PASSWORD")
 
-	dbName := os.Getenv("DB_NAME")
+	dbName := os.Getenv("MYSQL_DATABASE")
 	if dbName == "" {
 		dbName = "mysql"
 	}
@@ -39,11 +39,15 @@ func getDbCredentials() (string, string, string) {
 func run() error {
 	dbUser, dbPassword, dbName := getDbCredentials()
 	if dbPassword == "" {
-		return fmt.Errorf("DB_PASSWORD environment variable is required")
+		return fmt.Errorf("MYSQL_PASSWORD environment variable is required")
 	}
 
 	db, err := sql.Open("mysql", dbUser+":"+dbPassword+"@/"+dbName+"?parseTime=true")
 	if err != nil {
+		return err
+	}
+
+	if err := db.Ping(); err != nil {
 		return err
 	}
 
