@@ -44,11 +44,12 @@ dclean:
 .PHONY: migrations
 migrations:
 	atlas migrate diff \
-		--dir "file://migrations" \
-		--to "file://schema.hcl" \
+		--dir "file://db/migrations" \
+		--to "file://db/schema.hcl" \
 		--dev-url "docker://mysql/8/example"
 
 .PHONY: migrate
 migrate:
 	atlas migrate apply \
-		-u $(MYSQL_URL)
+		--dir "file://db/migrations" \
+		--url $(MYSQL_URL)
