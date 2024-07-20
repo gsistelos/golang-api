@@ -1,3 +1,9 @@
+BUF_GENERATE = buf generate --template proto/buf.gen.yaml
+
+SQLC_GENERATE = sqlc generate -f sqlc.yaml
+
+DOCKER_COMPOSE = docker compose -f docker-compose.yaml
+
 # Set variables if not set
 ifeq ($(MYSQL_USER),)
 	MYSQL_USER = root
@@ -14,11 +20,11 @@ all: proto sqlc run
 
 .PHONY: proto
 proto:
-	buf generate --template proto/buf.gen.yaml proto
+	$(BUF_GENERATE) proto
 
 .PHONY: sqlc
 sqlc:
-	sqlc generate -f sqlc/sqlc.yaml
+	$(SQLC_GENERATE)
 
 .PHONY: run
 run:
@@ -26,11 +32,11 @@ run:
 
 .PHONY: docker
 docker:
-	docker compose up -d
+	$(DOCKER_COMPOSE) up -d
 
 .PHONY: dclean
 dclean:
-	-docker compose down
+	-$(DOCKER_COMPOSE) down
 	-docker rm $$(docker ps -aq)
 	-docker network rm -f $$(docker network ls -q)
 	-docker volume rm -f $$(docker volume ls -q)

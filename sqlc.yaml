@@ -1,10 +1,10 @@
 version: "2"
 sql:
   - engine: "mysql"
-    schema: "../migrations"
+    schema: "db/migrations"
     queries:
-      - "users.sql"
+      - "db/users.sql"
     gen:
       go:
         package: "sqlc"
-        out: "../gen/sqlc"
+        out: "gen/sqlc"
