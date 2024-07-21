@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SqlcToV1(u *sqlc.User) *v1.User {
+func UserSqlcToV1(u *sqlc.User) *v1.User {
 	return &v1.User{
 		Id:       u.ID,
 		Username: u.Username,
@@ -40,7 +40,7 @@ func (s *Server) AddUser(ctx context.Context, req *v1.AddUserRequest) (*v1.AddUs
 		return nil, err
 	}
 
-	return &v1.AddUserResponse{User: SqlcToV1(&user)}, nil
+	return &v1.AddUserResponse{User: UserSqlcToV1(&user)}, nil
 }
 
 func (s *Server) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v1.GetUserResponse, error) {
@@ -49,7 +49,7 @@ func (s *Server) GetUser(ctx context.Context, req *v1.GetUserRequest) (*v1.GetUs
 		return nil, err
 	}
 
-	return &v1.GetUserResponse{User: SqlcToV1(&user)}, nil
+	return &v1.GetUserResponse{User: UserSqlcToV1(&user)}, nil
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.ListUsersResponse, error) {
@@ -60,7 +60,7 @@ func (s *Server) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.L
 
 	v1Users := make([]*v1.User, len(users))
 	for i, user := range users {
-		v1Users[i] = SqlcToV1(&user)
+		v1Users[i] = UserSqlcToV1(&user)
 	}
 
 	return &v1.ListUsersResponse{Users: v1Users}, nil
@@ -87,7 +87,7 @@ func (s *Server) UpdateUser(ctx context.Context, req *v1.UpdateUserRequest) (*v1
 		return nil, err
 	}
 
-	return &v1.UpdateUserResponse{User: SqlcToV1(&user)}, nil
+	return &v1.UpdateUserResponse{User: UserSqlcToV1(&user)}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserResponse, error) {

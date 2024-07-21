@@ -4,6 +4,7 @@ sql:
     schema: "db/migrations"
     queries:
       - "db/users.sql"
+      - "db/posts.sql"
     gen:
       go:
         package: "sqlc"

@@ -26,14 +26,14 @@ message AddUserRequest {
 
 message AddUserResponse { User user = 1; }
 
+message GetUserRequest { string user_id = 1; }
+
+message GetUserResponse { User user = 1; }
+
 message ListUsersRequest {
   int32 offset = 1;
   int32 limit = 2;
 }
-
-message GetUserRequest { string user_id = 1; }
-
-message GetUserResponse { User user = 1; }
 
 message ListUsersResponse {
   repeated User users = 1;

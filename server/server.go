@@ -4,14 +4,16 @@ import (
 	"context"
 	"database/sql"
 
+	postV1 "github.com/gsistelos/golang-api/gen/post/v1"
 	sqlc "github.com/gsistelos/golang-api/gen/sqlc"
-	v1 "github.com/gsistelos/golang-api/gen/user/v1"
+	userV1 "github.com/gsistelos/golang-api/gen/user/v1"
 )
 
 type Server struct {
 	ctx     context.Context
 	queries *sqlc.Queries
-	v1.UnimplementedUserServiceServer
+	postV1.UnimplementedPostServiceServer
+	userV1.UnimplementedUserServiceServer
 }
 
 func New(db *sql.DB) *Server {

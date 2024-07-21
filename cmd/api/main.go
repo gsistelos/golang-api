@@ -8,7 +8,8 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	v1 "github.com/gsistelos/golang-api/gen/user/v1"
+	postV1 "github.com/gsistelos/golang-api/gen/post/v1"
+	userV1 "github.com/gsistelos/golang-api/gen/user/v1"
 	"github.com/gsistelos/golang-api/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -54,7 +55,8 @@ func run() error {
 	grpcServer := grpc.NewServer()
 	srv := server.New(db)
 
-	v1.RegisterUserServiceServer(grpcServer, srv)
+	postV1.RegisterPostServiceServer(grpcServer, srv)
+	userV1.RegisterUserServiceServer(grpcServer, srv)
 	reflection.Register(grpcServer)
 
 	port := os.Getenv("PORT")
