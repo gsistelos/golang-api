@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	sqlc "github.com/gsistelos/golang-api/gen/sqlc"
 	v1 "github.com/gsistelos/golang-api/gen/user/v1"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func SqlcToV1(u *sqlc.User) *v1.User {
@@ -17,13 +18,18 @@ func SqlcToV1(u *sqlc.User) *v1.User {
 }
 
 func (s *Server) AddUser(ctx context.Context, req *v1.AddUserRequest) (*v1.AddUserResponse, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
 	id := uuid.NewString()
 
-	_, err := s.queries.CreateUser(ctx, sqlc.CreateUserParams{
+	_, err = s.queries.CreateUser(ctx, sqlc.CreateUserParams{
 		ID:       id,
 		Username: req.Username,
 		Email:    req.Email,
-		Password: req.Password,
+		Password: string(hashedPassword),
 	})
 	if err != nil {
 		return nil, err
@@ -61,10 +67,16 @@ func (s *Server) ListUsers(ctx context.Context, req *v1.ListUsersRequest) (*v1.L
 }
 
 func (s *Server) UpdateUser(ctx context.Context, req *v1.UpdateUserRequest) (*v1.UpdateUserResponse, error) {
-	_, err := s.queries.UpdateUser(ctx, sqlc.UpdateUserParams{
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.queries.UpdateUser(ctx, sqlc.UpdateUserParams{
 		ID:       req.UserId,
 		Username: req.Username,
 		Email:    req.Email,
+		Password: string(hashedPassword),
 	})
 	if err != nil {
 		return nil, err
