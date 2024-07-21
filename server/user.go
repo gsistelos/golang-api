@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	sqlc "github.com/gsistelos/grpc-api/gen/sqlc"
-	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
+	sqlc "github.com/gsistelos/golang-api/gen/sqlc"
+	v1 "github.com/gsistelos/golang-api/gen/user/v1"
 )
 
 func SqlcToV1(u *sqlc.User) *v1.User {

@@ -1,4 +1,4 @@
-module github.com/gsistelos/grpc-api
+module github.com/gsistelos/golang-api
 
 go 1.22.5
 

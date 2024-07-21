@@ -8,8 +8,8 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
-	"github.com/gsistelos/grpc-api/server"
+	v1 "github.com/gsistelos/golang-api/gen/user/v1"
+	"github.com/gsistelos/golang-api/server"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

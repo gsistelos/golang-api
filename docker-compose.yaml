@@ -1,6 +1,6 @@
 networks:
-  grpc-api:
-    name: grpc-api
+  golang-api:
+    name: golang-api
 
 volumes:
   data:
@@ -11,7 +11,7 @@ services:
     image: mysql
     env_file: .env
     networks:
-      - grpc-api
+      - golang-api
     ports:
       - "3306:3306"
     volumes:

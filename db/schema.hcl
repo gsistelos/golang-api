@@ -1,7 +1,7 @@
-schema "grpc-api" {}
+schema "golang-api" {}
 
 table "users" {
-    schema = schema.grpc-api
+    schema = schema.golang-api
     column "id" {
         type = varchar(36)
         null = false

@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	sqlc "github.com/gsistelos/grpc-api/gen/sqlc"
-	v1 "github.com/gsistelos/grpc-api/gen/user/v1"
+	sqlc "github.com/gsistelos/golang-api/gen/sqlc"
+	v1 "github.com/gsistelos/golang-api/gen/user/v1"
 )
 
 type Server struct {
