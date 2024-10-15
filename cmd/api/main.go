@@ -21,29 +21,32 @@ func main() {
 	}
 }
 
-func getDbCredentials() (string, string, string) {
-	dbUser := os.Getenv("MYSQL_USER")
-	if dbUser == "" {
+func getConnectionString() (string, error) {
+	dbUser, ok := os.LookupEnv("MYSQL_USER")
+	if !ok {
 		dbUser = "root"
 	}
 
-	dbPassword := os.Getenv("MYSQL_PASSWORD")
+	dbPassword, ok := os.LookupEnv("MYSQL_PASSWORD")
+	if !ok {
+		return "", fmt.Errorf("MYSQL_PASSWORD environment variable is required")
+	}
 
-	dbName := os.Getenv("MYSQL_DATABASE")
-	if dbName == "" {
+	dbName, ok := os.LookupEnv("MYSQL_DATABASE")
+	if !ok {
 		dbName = "mysql"
 	}
 
-	return dbUser, dbPassword, dbName
+	return fmt.Sprintf("%s:%s@/%s?parseTime=true", dbUser, dbPassword, dbName), nil
 }
 
 func run() error {
-	dbUser, dbPassword, dbName := getDbCredentials()
-	if dbPassword == "" {
-		return fmt.Errorf("MYSQL_PASSWORD environment variable is required")
+	connStr, err := getConnectionString()
+	if err != nil {
+		return err
 	}
 
-	db, err := sql.Open("mysql", dbUser+":"+dbPassword+"@/"+dbName+"?parseTime=true")
+	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		return err
 	}
