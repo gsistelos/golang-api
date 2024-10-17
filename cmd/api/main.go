@@ -40,6 +40,15 @@ func getConnectionString() (string, error) {
 	return fmt.Sprintf("%s:%s@/%s?parseTime=true", dbUser, dbPassword, dbName), nil
 }
 
+func getAddr() string {
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "8000"
+	}
+
+	return fmt.Sprintf("127.0.0.1:%s", port)
+}
+
 func run() error {
 	connStr, err := getConnectionString()
 	if err != nil {
@@ -62,14 +71,11 @@ func run() error {
 	userV1.RegisterUserServiceServer(grpcServer, srv)
 	reflection.Register(grpcServer)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
+	addr := getAddr()
 
-	lis, err := net.Listen("tcp", ":"+port)
+	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		return fmt.Errorf("failed to listen to port %s", port)
+		return fmt.Errorf("failed to listen to address %s", addr)
 	}
 	defer lis.Close()
 
