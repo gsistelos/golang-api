@@ -54,7 +54,7 @@ func getAddr() string {
 		port = "8000"
 	}
 
-	return fmt.Sprintf("127.0.0.1:%s", port)
+	return fmt.Sprintf(":%s", port)
 }
 
 func run() error {
