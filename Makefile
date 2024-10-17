@@ -28,6 +28,7 @@ endif
 MYSQL_URL = "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_ADDRESS)/$(MYSQL_DATABASE)"
 
 
+.PHONY: all
 all: proto sqlc build
 
 .PHONY: proto
