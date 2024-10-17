@@ -17,19 +17,28 @@ ifeq ($(MYSQL_USER),)
 	MYSQL_USER = root
 endif
 
-ifeq ($(MYSQL_ADDRESS),)
-	MYSQL_ADDRESS = mysql:3306
+ifeq ($(MYSQL_ADDR),)
+	MYSQL_ADDR = mysql:3306
 endif
 
 ifeq ($(MYSQL_DATABASE), mysql)
 	MYSQL_DATABASE = mysql
 endif
 
-MYSQL_URL = "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_ADDRESS)/$(MYSQL_DATABASE)"
+MYSQL_URL = "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@$(MYSQL_ADDR)/$(MYSQL_DATABASE)"
 
 
 .PHONY: all
-all: proto sqlc build
+all: build
+
+.PHONY: build
+build: $(BINARIES)
+
+$(BIN_DIR)/%: $(CMD_DIR)/%
+	go build -o $@ ./$<
+
+.PHONY: gen
+gen: proto sqlc
 
 .PHONY: proto
 proto:
@@ -38,12 +47,6 @@ proto:
 .PHONY: sqlc
 sqlc:
 	$(SQLC_GENERATE)
-
-.PHONY: build
-build: $(BINARIES)
-
-$(BIN_DIR)/%: $(CMD_DIR)/%
-	go build -o $@ ./$<
 
 .PHONY: clean
 clean:

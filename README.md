@@ -27,18 +27,32 @@ A simple API to learn [go](https://go.dev/) and tools.
 
 ## Makefile rules
 
+`all`: Calls `build`
+
+`build`: Builds binaries from `cmd/*` in `bin/`.
+
+`gen`: Calls `proto` and `sqlc`.
+
+`proto`: Generates go code in `gen/` from proto code in `proto/`.
+
+`sqlc`: Generates go code in `gen/` from sql `db/*.sql` files.
+
 `docker`: Starts all containers from `docker-compose.yaml`.
 
 `dclean`: Stops and cleans all containers, networks and volumes.
 
-`migrations`: Use atlas to generate migration files.
+`mdiff`: Use atlas to generate migration files.
 
-`migrate`: Push migrations to the database.
+`mapply`: Push migrations to the database.
 
-`sqlc`: Generates go code in `gen/` from sql `db/*.sql` files.
+Environment variables:
 
-`proto`: Generates go code in `gen/` from proto code in `proto/`.
+These variables are used by `atlas` to apply migrations.
 
-`run`: Run the API
+`MYSQL_PASSWORD`: Required. Password for the mysql database.
 
-`all`: Calls `sqlc`, `proto` and `run`.
+`MYSQL_USER`: User of the mysql database. Default: `root`.
+
+`MYSQL_ADDR`: Address of the mysql database. Default: `mysql:3306`.
+
+`MYSQL_DATABASE`: Database name. Default: `mysql`.

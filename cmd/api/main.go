@@ -27,6 +27,11 @@ func getConnectionString() (string, error) {
 		dbUser = "root"
 	}
 
+	dbAddr, ok := os.LookupEnv("MYSQL_ADDR")
+	if !ok {
+		dbAddr = "mysql:3306"
+	}
+
 	dbPassword, ok := os.LookupEnv("MYSQL_PASSWORD")
 	if !ok {
 		return "", fmt.Errorf("MYSQL_PASSWORD environment variable is required")
@@ -37,7 +42,10 @@ func getConnectionString() (string, error) {
 		dbName = "mysql"
 	}
 
-	return fmt.Sprintf("%s:%s@/%s?parseTime=true", dbUser, dbPassword, dbName), nil
+	connStr := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true",
+		dbUser, dbPassword, dbAddr, dbName)
+
+	return connStr, nil
 }
 
 func getAddr() string {
@@ -79,5 +87,6 @@ func run() error {
 	}
 	defer lis.Close()
 
+	log.Printf("Server listening on %s", addr)
 	return grpcServer.Serve(lis)
 }
